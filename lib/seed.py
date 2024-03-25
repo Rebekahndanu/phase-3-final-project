@@ -18,14 +18,14 @@ if __name__ == '__main__':
     mysession.query(Attendee).delete()
     mysession.commit()
 
-    # Generating fake data for the Venue table
+    # Generating data for the Venue table
     for i in range(10): 
         venue = Venue(name=fake.company(), location=fake.address())
         mysession.add(venue)
     mysession.commit()
 
 
-    # Define some helper functions for generating random dates and times
+    # Define functions for generating random dates and times
     def random_date(start_date, end_date):
         time_between_dates = end_date - start_date
         days_between_dates = time_between_dates.days
@@ -35,7 +35,7 @@ if __name__ == '__main__':
     def random_time():
         return fake.time()
 
-    # Generating fake data for the Event table
+    # Generating data for the Event table
     for i in range(20): 
         start_date = datetime.now()
         end_date = start_date + timedelta(days=30)  
@@ -47,7 +47,7 @@ if __name__ == '__main__':
 
     mysession.commit()
 
-    # Generating fake data for the Attendee table
+    # Generating data for the Attendee table
     for i in range(30): 
         attendee = Attendee(name=fake.name(), email=fake.email(), ticket_number=fake.random_int(min=1000, max=9999))
         mysession.add(attendee)
