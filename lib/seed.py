@@ -1,6 +1,7 @@
 from models import create_engine, Base, sessionmaker, Venue, Event, Attendee
 from faker import Faker
 from datetime import datetime, timedelta
+from random import sample
 
 engine = create_engine('sqlite:///events.db')
 Base.metadata.create_all(engine)
@@ -35,20 +36,31 @@ if __name__ == '__main__':
         return fake.time()
 
     # Generating fake data for the Event table
-    for i in range(20):  # You can adjust this number to generate more or fewer events
+    for i in range(20): 
         start_date = datetime.now()
-        end_date = start_date + timedelta(days=30)  # Events within the next 30 days
+        end_date = start_date + timedelta(days=30)  
         event = Event(event_name=fake.word().capitalize(), 
                     description=fake.sentence(),
                     date=random_date(start_date, end_date),
-                    venue_id=fake.random_int(min=1, max=10))  # Assuming 10 venues exist
+                    venue_id=fake.random_int(min=1, max=10))  
         mysession.add(event)
 
     mysession.commit()
 
     # Generating fake data for the Attendee table
-    for i in range(30):  # You can adjust this number to generate more or fewer attendees
+    for i in range(30): 
         attendee = Attendee(name=fake.name(), email=fake.email(), ticket_number=fake.random_int(min=1000, max=9999))
         mysession.add(attendee)
+
+    mysession.commit()
+
+    # Associate attendees with events (generate data for event_attendees table)
+    events = mysession.query(Event).all()
+    attendees = mysession.query(Attendee).all()
+    for event in events:
+        # Assuming each event has between 1 to 10 attendees
+        num_attendees = fake.random_int(min=1, max=10)  
+        selected_attendees = sample(attendees, num_attendees)
+        event.attendees.extend(selected_attendees)
 
     mysession.commit()

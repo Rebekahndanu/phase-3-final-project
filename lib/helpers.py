@@ -1,5 +1,6 @@
-from models import Venue
+from models import Venue, Event, Attendee
 from seed import mysession
+from datetime import datetime
 
 def list_venues():
     venues = mysession.query(Venue).all()
@@ -16,14 +17,7 @@ def delete_venue():
         print(f"Venue '{venue_name}' (ID: {venue_id}) deleted successfully.")
     else:
         print(f"Venue with ID {venue_id} not found.")
-
-def find_venue_by_name(name):
-    pass
-
-def find_venue_by_id():
-    pass
     
-
 def create_venue():
     venue_name = input("Enter the venues name: ")
     venue_location = input("Enter the location: ")
@@ -31,47 +25,59 @@ def create_venue():
     mysession.add(venue)
     mysession.commit()
     print(f"New venue {venue_name} created successfully")
-
-def update_venue():
-    venue_id = int(input("Enter the ID of the venue you want to update: "))
-    venue = find_venue_by_id()
-    if venue:
-        new_name = input("Enter the new name for the venue (leave blank to keep current): ").strip()
-        new_location = input("Enter the new location for the venue (leave blank to keep current): ").strip()
-
-        # Update the venue's attributes if new values are provided
-        if new_name:
-            venue.name = new_name
-        if new_location:
-            venue.location = new_location
-
-        mysession.commit()
-        print(f"Venue with ID {venue_id} updated successfully.")
-    else:
-        print(f"Venue with ID {venue_id} not found.")
-    
     
 
 def list_events():
-    pass
+    events = mysession.query(Event).all()
+    for event in events:
+        print(event)
 
 def find_events_by_name(name):
-    pass
+    events = mysession.query(Event).filter(Event.event_name == name).all()
+    if events:
+        for event in events:
+            print(event)
+    else:
+        print(f"No events found with the name '{name}'.")
 
 def find_events_by_id(event_id):
-    pass
-
-def create_event():
-    pass
+    event = mysession.query(Event).filter(Event.id == event_id).first()
+    if event:
+        print(event)
+    else:
+        print(f"No event found with ID '{event_id}'.")
 
 def update_event():
-    pass
+    event_id = int(input("Enter the ID of the event you want to update: "))
+    event = mysession.query(Event).filter_by(id=event_id).first()
+    
+    if event:
+        event_name = input(f"Enter the new name for the event (current name: {event.event_name}): ")
+        event_description = input(f"Enter the new description for the event (current description: {event.description}): ")
+        event_date = input(f"Enter the new date for the event (current date: {event.date}): ")
+        venue_id = int(input(f"Enter the new venue ID for the event (current venue ID: {event.venue_id}): "))
+        
+        try:
+            event_date = datetime.strptime(event_date, "%Y-%m-%d %H:%M:%S")
+        except ValueError:
+            print("Invalid date format. Please enter the date in YYYY-MM-DD HH:MM:SS format.")
+            return
+        
+        event.event_name = event_name
+        event.description = event_description
+        event.date = event_date
+        event.venue_id = venue_id
+        
+        mysession.commit()
+        print(f"Event '{event_name}' (ID: {event_id}) updated successfully.")
+    else:
+        print(f"Event with ID {event_id} not found.")
 
-def delete_event():
-    pass
 
-def list_event_attendees():
-    pass
+def list_attendees():
+    attendees = mysession.query(Attendee).all()
+    for attendee in attendees:
+        print(attendee)
 
 def exit_program():
     print("Goodbye!")
